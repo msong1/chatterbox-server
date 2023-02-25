@@ -35,8 +35,8 @@ var requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
-  console.log('Serving request type ' + request.method + ' for url ' + request.url); // GUESS: request.method ==> POST GET... / url requestURL ..../messages/CAMPUS
-
+  console.log('Serving111 request type ' + request.method + ' for url ' + request.url); // GUESS: request.method ==> POST GET... / url requestURL ..../messages/CAMPUS
+  console.log('NOW');
   // requestObj format =>
   // {
   //   url: '/classes/messages',
@@ -71,24 +71,38 @@ var requestHandler = function(request, response) {
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
-
+  // response.writeHead(statusCode, headers);
+  console.log('HERE?');
   if (request.method === 'GET' && request.url.includes('/messages')) {
     // need to check if it is a valid request somehow
-    console.log('WHATS UP', response);
+    // console.log('WHATS UP', response);
     // console.log('!! MESSAGES !!', messages);
     statusCode = 200;
     response.writeHead(statusCode, headers);
+    debugger; //==================
     response._data = messages;
+    // response._data = messages;
     response.end(JSON.stringify(response._data));
+
+  } else if (request.method === 'OPTIONS' && request.url.includes('/messages')) {
+    statusCode = 201;
+    response.writeHead(statusCode, headers);
+    response.end();
+
   } else if (request.method === 'POST' && request.url.includes('/messages')) {
     // do we need to set statusCode?
     statusCode = 201; // according to Spec..
     response.writeHead(statusCode, headers);
     // unshift the message to the message list
-    console.log(response);
-    messages.unshift(request._postData);
-    response.end('POST successful');
+    // console.log(response);
+    // messages.unshift(request._postData);
+    // console.log(request);
+    request.on('data', function (data) {
+      // console.log(data.toString());
+      messages.unshift(JSON.parse(data.toString()));
+    });
+    console.log(messages);
+    response.end('POST Successful');
   } else {
     statusCode = 404;
     response.writeHead(statusCode, headers);
